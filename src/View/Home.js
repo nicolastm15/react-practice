@@ -33,7 +33,7 @@ const Home = () => {
 
 		if (products.fetchError) return <p>Error while fetching data. Please refresh or try again later.</p>;
 		else {
-			return products.data.map((product) => <ProductCard product={product} />);
+			return products.data.map((product) => <ProductCard key={product.id} product={product} />);
 		}
 	};
 
