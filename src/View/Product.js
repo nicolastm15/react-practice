@@ -9,6 +9,7 @@ const Product = () => {
 	const [product, setProduct] = useState({
 		loading: true,
 		data: null,
+		error: false,
 	});
 
 	useEffect(() => {
@@ -16,27 +17,36 @@ const Product = () => {
 			setProduct((prevState) => {
 				return { ...prevState, loading: true };
 			});
-			const response = await axios.get(url);
-			setProduct({ loading: false, data: response.data });
+			try {
+				const response = await axios.get(url);
+				setProduct({ loading: false, data: response.data, error: false });
+			} catch (error) {
+				setProduct({ loading: false, data: null, error: true });
+			}
 		};
 
 		fetchProduct();
 	}, [url]);
 
-	const content = product.loading ? (
-		<Loader/>
-	) : (
-		<div>
-			<h1 className='text-2xl font-bold mb-3'>{product.data.name}</h1>
-			<div>
-				<img src={product.data.images[0].imageUrl} alt={product.data.name} />
-			</div>
-			<div className='font-bold text-xl mb-3'>${product.data.price}</div>
-			<div>{product.data.description}</div>
-		</div>
-	);
+	const loadContent = () => {
+		if (product.loading) return <Loader />;
+		else {
+			return product.error ? (
+				<p>Error while fetching data. Please refresh or try again later.</p>
+			) : (
+				<div>
+					<h1 className='text-2xl font-bold mb-3'>{product.data.name}</h1>
+					<div>
+						<img src={product.data.images[0].imageUrl} alt={product.data.name} />
+					</div>
+					<div className='font-bold text-xl mb-3'>${product.data.price}</div>
+					<div>{product.data.description}</div>
+				</div>
+			);
+		}
+	};
 
-	return content;
+	return loadContent();
 };
 
 export default Product;
